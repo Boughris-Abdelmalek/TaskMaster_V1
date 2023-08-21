@@ -24,6 +24,7 @@ func main() {
 	router.HandleFunc("/todos", GetTodos).Methods("GET")
 	router.HandleFunc("/todos", CreateTodo).Methods("POST")
 	router.HandleFunc("/todos/{id}", GetTodosById).Methods("GET")
+	router.HandleFunc("/todos/{id}", DeleteTodosById).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -63,4 +64,18 @@ func GetTodosById(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNotFound)
 	w.Write([]byte("Todo not found"))
+}
+
+func DeleteTodosById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	todos := []Todo{}
+	for _, todo := range todoMap {
+		if todo.ID != id {
+			todos = append(todos, todo)
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(todos)
 }
