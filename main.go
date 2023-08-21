@@ -23,6 +23,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/todos", GetTodos).Methods("GET")
 	router.HandleFunc("/todos", CreateTodo).Methods("POST")
+	router.HandleFunc("/todos/{id}", GetTodosById).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -45,4 +46,21 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(newTodo)
+}
+
+func GetTodosById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	for _, todo := range todoMap {
+		if todo.ID == id {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(todo)
+
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("Todo not found"))
 }
