@@ -2,11 +2,33 @@ version: "3.8"
 
 services:
   api:
+    restart: on-failure
     build: .
     env_file:
       - .env
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres
     volumes:
       - .:/usr/src/app
     command: air ./cmd/main.go -b 0.0.0.0
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
+    image: "task-master-image-db"
+    container_name: ${DB_CONTAINER_NAME}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - PGDATA=${DB_DATA}
+    volumes:
+      - postgres-db:/data/task-master-db
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres-db:
