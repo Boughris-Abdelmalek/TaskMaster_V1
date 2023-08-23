@@ -23,7 +23,7 @@ func NewAPIServer(listenAddr string, store postgres.Storage) *APIServer {
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/todos", makeHTTPHandleFunc(s.handleGetTodos))
+	router.HandleFunc("/todos", makeHTTPHandleFunc(s.handleGetTodos)).Methods("GET")
 
 	log.Println("JSON API server running on port: ", s.listenAddr)
 
@@ -33,6 +33,7 @@ func (s *APIServer) Run() {
 func (s *APIServer) handleGetTodos(w http.ResponseWriter, r *http.Request) error {
 	todos, err := s.store.GetTodos()
 	if err != nil {
+		log.Println("Error getting todos:", err)
 		return err
 	}
 

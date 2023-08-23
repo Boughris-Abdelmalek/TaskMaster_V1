@@ -23,11 +23,6 @@ func main() {
 
 	server := api.NewAPIServer(":8080", store)
 	server.Run()
-
-	//router.HandleFunc("/todos", CreateTodo).Methods("POST")
-	//router.HandleFunc("/todos/{id}", GetTodoById).Methods("GET")
-	//router.HandleFunc("/todos/{id}", DeleteTodo).Methods("DELETE")
-	//router.HandleFunc("/todos/{id}", UpdateTodo).Methods("PUT")
 }
 
 func GetTodos(w http.ResponseWriter, r *http.Request, store postgres.PostgresStore) {
