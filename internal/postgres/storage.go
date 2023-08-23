@@ -25,6 +25,7 @@ var (
 
 type Storage interface {
 	GetTodos() ([]types.Todo, error)
+	GetTodoByID(int) (*types.Todo, error)
 	CreateTodo(*types.Todo) error
 }
 
@@ -79,4 +80,26 @@ func (s *PostgresStore) CreateTodo(todo *types.Todo) error {
 	}
 
 	return nil
+}
+
+func (s *PostgresStore) GetTodoByID(id int) (*types.Todo, error) {
+	rows, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	todo := new(types.Todo)
+
+	for rows.Next() {
+		err := rows.Scan(
+			&todo.ID,
+			&todo.Title,
+			&todo.Description,
+			&todo.Completed,
+		)
+		return todo, err
+	}
+
+	return nil, fmt.Errorf("account with number [%d] not found", id)
 }
