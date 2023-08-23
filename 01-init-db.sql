@@ -1,8 +1,0 @@
--- CREATE TABLE
-DROP TABLE IF EXISTS todos;
-CREATE TABLE todos(
-    id SERIAL NOT NULL PRIMARY KEY,
-    title VARCHAR(50),
-    description VARCHAR(100),
-    status BOOLEAN
-);

@@ -25,10 +25,10 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - PGDATA=${DB_DATA}
     volumes:
-      - postgres-db:/data/task-master-db
+      - postgres:/data/task-master-sql
     ports:
       - "5432:5432"
     restart: unless-stopped
 
 volumes:
-  postgres-db:
+  postgres:
