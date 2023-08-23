@@ -25,6 +25,7 @@ var (
 
 type Storage interface {
 	GetTodos() ([]types.Todo, error)
+	CreateTodo(*types.Todo) error
 }
 
 type PostgresStore struct {
@@ -67,4 +68,15 @@ func (s *PostgresStore) GetTodos() ([]types.Todo, error) {
 	}
 
 	return todos, nil
+}
+
+func (s *PostgresStore) CreateTodo(todo *types.Todo) error {
+	query := `INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING id`
+
+	_, err := s.db.Query(query, todo.Title, todo.Description, todo.Completed)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -6,3 +6,16 @@ type Todo struct {
 	Description string `json:"description"`
 	Completed   bool   `json:"completed"`
 }
+
+type CreateTodoRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+func NewTodo(title, description string) (*Todo, error) {
+	return &Todo{
+		Title:       title,
+		Description: description,
+		Completed:   false,
+	}, nil
+}

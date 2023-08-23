@@ -5,7 +5,6 @@ import (
 	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api"
 	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/postgres"
 	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/types"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -23,27 +22,6 @@ func main() {
 
 	server := api.NewAPIServer(":8080", store)
 	server.Run()
-}
-
-func GetTodos(w http.ResponseWriter, r *http.Request, store postgres.PostgresStore) {
-	todos, err := store.GetTodos()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(todos)
-}
-
-func CreateTodo(w http.ResponseWriter, r *http.Request) {
-	var newTodo types.Todo
-	_ = json.NewDecoder(r.Body).Decode(&newTodo)
-
-	newTodo.ID = uuid.New().String()
-	todoMap[newTodo.ID] = newTodo
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(newTodo)
 }
 
 func GetTodoById(w http.ResponseWriter, r *http.Request) {
