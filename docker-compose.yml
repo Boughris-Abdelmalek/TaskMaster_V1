@@ -26,8 +26,11 @@ services:
       - PGDATA=${DB_DATA}
     volumes:
       - postgres:/data/task-master-sql
+    command: -p 5431
     ports:
-      - "5432:5432"
+      - "5432:5431"
+    expose:
+      - "5431"
     restart: unless-stopped
 
 volumes:

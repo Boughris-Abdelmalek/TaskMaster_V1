@@ -27,6 +27,7 @@ type Storage interface {
 	GetTodos() ([]types.Todo, error)
 	GetTodoByID(int) (*types.Todo, error)
 	CreateTodo(*types.Todo) error
+	DeleteTodo(int) error
 }
 
 type PostgresStore struct {
@@ -102,4 +103,9 @@ func (s *PostgresStore) GetTodoByID(id int) (*types.Todo, error) {
 	}
 
 	return nil, fmt.Errorf("account with number [%d] not found", id)
+}
+
+func (s *PostgresStore) DeleteTodo(id int) error {
+	_, err := s.db.Query("DELETE FROM todos WHERE id = $1", id)
+	return err
 }

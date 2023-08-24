@@ -31,6 +31,7 @@ func (s *APIServer) Run() {
 	router.HandleFunc("/todos", makeHTTPHandleFunc(s.handleGetTodo)).Methods("GET")
 	router.HandleFunc("/todos", makeHTTPHandleFunc(s.handleCreateTodo)).Methods("POST")
 	router.HandleFunc("/todos/{id}", makeHTTPHandleFunc(s.handleGetTodoByID)).Methods("GET")
+	router.HandleFunc("/todos/{id}", makeHTTPHandleFunc(s.handleDeleteTodo)).Methods("DELETE")
 
 	log.Println("JSON API server running on port: ", s.listenAddr)
 
@@ -78,6 +79,20 @@ func (s *APIServer) handleGetTodoByID(w http.ResponseWriter, r *http.Request) er
 	}
 
 	return WriteJSON(w, http.StatusOK, todo)
+}
+
+func (s *APIServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return err
+	}
+
+	if err := s.store.DeleteTodo(id); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
 }
 
 // WriteJSON is a Helper function to return JSON response to client
