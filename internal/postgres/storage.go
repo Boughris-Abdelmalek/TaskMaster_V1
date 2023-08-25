@@ -28,6 +28,7 @@ type Storage interface {
 	GetTodoByID(int) (*types.Todo, error)
 	CreateTodo(*types.Todo) error
 	DeleteTodo(int) error
+	UpdateTodo(int, *types.Todo) (*types.Todo, error)
 }
 
 type PostgresStore struct {
@@ -108,4 +109,37 @@ func (s *PostgresStore) GetTodoByID(id int) (*types.Todo, error) {
 func (s *PostgresStore) DeleteTodo(id int) error {
 	_, err := s.db.Query("DELETE FROM todos WHERE id = $1", id)
 	return err
+}
+
+func (s *PostgresStore) UpdateTodo(id int, todoUpdate *types.Todo) (*types.Todo, error) {
+	// Retrieve the existing todo from the database
+	row, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+
+	todo := new(types.Todo)
+	if row.Next() {
+		err := row.Scan(
+			&todo.ID,
+			&todo.Title,
+			&todo.Description,
+			&todo.Completed,
+		)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("todo with ID %d not found", id)
+	}
+
+	// Update the todo in the database
+	_, execErr := s.db.Exec("UPDATE todos SET title = $1, description = $2, completed = $3 WHERE id = $4",
+		todoUpdate.Title, todoUpdate.Description, todoUpdate.Completed, id)
+	if execErr != nil {
+		return nil, execErr
+	}
+
+	return todo, nil
 }
