@@ -35,6 +35,7 @@ type PostgresStore struct {
 	db *sql.DB
 }
 
+// NewPostgres set up the connection to with the db
 func NewPostgres() (*PostgresStore, error) {
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, password, schema)
 	db, err := sql.Open("postgres", connStr)
@@ -53,6 +54,7 @@ func NewPostgres() (*PostgresStore, error) {
 	}, nil
 }
 
+// GetTodos is a method that performs a query to get all the todos
 func (s *PostgresStore) GetTodos() ([]types.Todo, error) {
 	var todos []types.Todo
 
@@ -73,6 +75,7 @@ func (s *PostgresStore) GetTodos() ([]types.Todo, error) {
 	return todos, nil
 }
 
+// CreateTodo is a method that performs a query to create new todo
 func (s *PostgresStore) CreateTodo(todo *types.Todo) error {
 	query := `INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING id`
 
@@ -84,6 +87,7 @@ func (s *PostgresStore) CreateTodo(todo *types.Todo) error {
 	return nil
 }
 
+// GetTodoByID is a method that performs a query to get one todo by ID
 func (s *PostgresStore) GetTodoByID(id int) (*types.Todo, error) {
 	rows, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
 	if err != nil {
@@ -106,11 +110,13 @@ func (s *PostgresStore) GetTodoByID(id int) (*types.Todo, error) {
 	return nil, fmt.Errorf("account with number [%d] not found", id)
 }
 
+// DeleteTodo is a method that performs a query to delete todos
 func (s *PostgresStore) DeleteTodo(id int) error {
 	_, err := s.db.Query("DELETE FROM todos WHERE id = $1", id)
 	return err
 }
 
+// UpdateTodo is a method that performs a query to update todos
 func (s *PostgresStore) UpdateTodo(id int, todoUpdate *types.Todo) (*types.Todo, error) {
 	// Retrieve the existing todo from the database
 	row, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)

@@ -2,10 +2,9 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/postgres"
-	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/types"
 	"github.com/gorilla/mux"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -22,103 +21,6 @@ func NewAPIServer(listenAddr string, store postgres.Storage) *APIServer {
 		listenAddr: listenAddr,
 		store:      store,
 	}
-}
-
-// Run starts the API server and listens for incoming requests.
-func (s *APIServer) Run() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/todos", makeHTTPHandleFunc(s.handleGetTodo)).Methods("GET")
-	router.HandleFunc("/todos", makeHTTPHandleFunc(s.handleCreateTodo)).Methods("POST")
-	router.HandleFunc("/todos/{id}", makeHTTPHandleFunc(s.handleGetTodoByID)).Methods("GET")
-	router.HandleFunc("/todos/{id}", makeHTTPHandleFunc(s.handleDeleteTodo)).Methods("DELETE")
-	router.HandleFunc("/todos/{id}", makeHTTPHandleFunc(s.handleUpdateTodo)).Methods("PATCH")
-
-	log.Println("JSON API server running on port: ", s.listenAddr)
-
-	http.ListenAndServe(s.listenAddr, router)
-}
-
-// handleGetTodos handles the GET request for fetching todos.
-func (s *APIServer) handleGetTodo(w http.ResponseWriter, r *http.Request) error {
-	todos, err := s.store.GetTodos()
-	if err != nil {
-		log.Println("Error getting todos:", err)
-		return err
-	}
-
-	return WriteJSON(w, http.StatusOK, todos)
-}
-
-func (s *APIServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
-	req := new(types.CreateTodoRequest)
-	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-		return err
-	}
-
-	todo, err := types.NewTodo(req.Title, req.Description)
-	if err != nil {
-		return err
-	}
-	if err := s.store.CreateTodo(todo); err != nil {
-		return err
-	}
-
-	return WriteJSON(w, http.StatusOK, todo)
-}
-
-func (s *APIServer) handleGetTodoByID(w http.ResponseWriter, r *http.Request) error {
-	idStr := mux.Vars(r)["id"]
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return err
-	}
-
-	todo, err := s.store.GetTodoByID(id)
-	if err != nil {
-		return err
-	}
-
-	return WriteJSON(w, http.StatusOK, todo)
-}
-
-func (s *APIServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
-	idStr := mux.Vars(r)["id"]
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return err
-	}
-
-	if err := s.store.DeleteTodo(id); err != nil {
-		return err
-	}
-
-	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
-}
-
-func (s *APIServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request) error {
-	req := new(types.UpdateTodoRequest)
-	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-		return err
-	}
-
-	idStr := mux.Vars(r)["id"]
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		return err
-	}
-
-	todo, err := types.NewTodoUpdate(req.Title, req.Description, req.Completed)
-	if err != nil {
-		return err
-	}
-
-	updatedTodo, err := s.store.UpdateTodo(id, todo)
-	if err != nil {
-		return err
-	}
-
-	return WriteJSON(w, http.StatusOK, updatedTodo)
 }
 
 // WriteJSON is a Helper function to return JSON response to client
@@ -144,4 +46,15 @@ func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
 			WriteJSON(w, http.StatusBadRequest, ApiError{Error: err.Error()})
 		}
 	}
+}
+
+// getID is a helper function that returns the id from the url
+func getID(r *http.Request) (int, error) {
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return id, fmt.Errorf("invalid id given %s", idStr)
+	}
+
+	return id, nil
 }
