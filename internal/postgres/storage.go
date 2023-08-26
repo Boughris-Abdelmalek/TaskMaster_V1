@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/types"
+	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -24,11 +24,11 @@ var (
 )
 
 type Storage interface {
-	GetTodos() ([]types.Todo, error)
-	GetTodoByID(int) (*types.Todo, error)
-	CreateTodo(*types.Todo) error
+	GetTodos() ([]api.Todo, error)
+	GetTodoByID(int) (*api.Todo, error)
+	CreateTodo(*api.Todo) error
 	DeleteTodo(int) error
-	UpdateTodo(int, *types.Todo) (*types.Todo, error)
+	UpdateTodo(int, *api.Todo) (*api.Todo, error)
 }
 
 type PostgresStore struct {
@@ -55,17 +55,17 @@ func NewPostgres() (*PostgresStore, error) {
 }
 
 // GetTodos is a method that performs a query to get all the todos
-func (s *PostgresStore) GetTodos() ([]types.Todo, error) {
-	var todos []types.Todo
+func (s *PostgresStore) GetTodos() ([]api.Todo, error) {
+	var todos []api.Todo
 
-	rows, err := s.db.Query("SELECT * FROM todos")
+	rows, err := s.db.Query("SELECT * FROM todos ORDER BY id")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var todo types.Todo
+		var todo api.Todo
 		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.Completed); err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func (s *PostgresStore) GetTodos() ([]types.Todo, error) {
 }
 
 // CreateTodo is a method that performs a query to create new todo
-func (s *PostgresStore) CreateTodo(todo *types.Todo) error {
+func (s *PostgresStore) CreateTodo(todo *api.Todo) error {
 	query := `INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING id`
 
 	_, err := s.db.Query(query, todo.Title, todo.Description, todo.Completed)
@@ -88,23 +88,14 @@ func (s *PostgresStore) CreateTodo(todo *types.Todo) error {
 }
 
 // GetTodoByID is a method that performs a query to get one todo by ID
-func (s *PostgresStore) GetTodoByID(id int) (*types.Todo, error) {
+func (s *PostgresStore) GetTodoByID(id int) (*api.Todo, error) {
 	rows, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	todo := new(types.Todo)
 
 	for rows.Next() {
-		err := rows.Scan(
-			&todo.ID,
-			&todo.Title,
-			&todo.Description,
-			&todo.Completed,
-		)
-		return todo, err
+		return scanIntoTodos(rows)
 	}
 
 	return nil, fmt.Errorf("account with number [%d] not found", id)
@@ -117,7 +108,7 @@ func (s *PostgresStore) DeleteTodo(id int) error {
 }
 
 // UpdateTodo is a method that performs a query to update todos
-func (s *PostgresStore) UpdateTodo(id int, todoUpdate *types.Todo) (*types.Todo, error) {
+func (s *PostgresStore) UpdateTodo(id int, todoUpdate *api.Todo) (*api.Todo, error) {
 	// Retrieve the existing todo from the database
 	row, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
 	if err != nil {
@@ -125,27 +116,37 @@ func (s *PostgresStore) UpdateTodo(id int, todoUpdate *types.Todo) (*types.Todo,
 	}
 	defer row.Close()
 
-	todo := new(types.Todo)
 	if row.Next() {
-		err := row.Scan(
-			&todo.ID,
-			&todo.Title,
-			&todo.Description,
-			&todo.Completed,
-		)
+		todo, err := scanIntoTodos(row)
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		return nil, fmt.Errorf("todo with ID %d not found", id)
+
+		// Update the todo fields with the new values
+		todo.Title = todoUpdate.Title
+		todo.Description = todoUpdate.Description
+		todo.Completed = todoUpdate.Completed
+
+		// Update the todo in the database
+		_, execErr := s.db.Exec("UPDATE todos SET title = $1, description = $2, completed = $3 WHERE id = $4",
+			todo.Title, todo.Description, todo.Completed, id)
+		if execErr != nil {
+			return nil, execErr
+		}
+
+		return todo, nil
 	}
 
-	// Update the todo in the database
-	_, execErr := s.db.Exec("UPDATE todos SET title = $1, description = $2, completed = $3 WHERE id = $4",
-		todoUpdate.Title, todoUpdate.Description, todoUpdate.Completed, id)
-	if execErr != nil {
-		return nil, execErr
-	}
+	return nil, fmt.Errorf("todo with ID %d not found", id)
+}
 
-	return todo, nil
+func scanIntoTodos(rows *sql.Rows) (*api.Todo, error) {
+	todo := new(api.Todo)
+	err := rows.Scan(
+		&todo.ID,
+		&todo.Title,
+		&todo.Description,
+		&todo.Completed,
+	)
+	return todo, err
 }

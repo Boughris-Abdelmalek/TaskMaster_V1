@@ -13,5 +13,5 @@ func main() {
 	}
 
 	server := api.NewAPIServer(":8080", store)
-	server.Run()
+	server.RegisterRoutes()
 }

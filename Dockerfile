@@ -7,4 +7,4 @@ RUN go install github.com/cosmtrek/air@latest
 COPY . .
 RUN go mod tidy
 
-EXPOSE 8081
+EXPOSE 8080

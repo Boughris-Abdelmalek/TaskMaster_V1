@@ -2,14 +2,16 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api/models"
+	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strconv"
 )
 
-// handleGetTodos handles the GET request for fetching todos.
-func (s *APIServer) handleGetTodo(w http.ResponseWriter, r *http.Request) error {
-	todos, err := s.store.GetTodos()
+// HandleGetTodo handles the GET request for fetching todos.
+func HandleGetTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	todos, err := s.Store.GetTodos()
 	if err != nil {
 		log.Println("Error getting todos:", err)
 		return err
@@ -18,32 +20,32 @@ func (s *APIServer) handleGetTodo(w http.ResponseWriter, r *http.Request) error 
 	return WriteJSON(w, http.StatusOK, todos)
 }
 
-// handleCreateTodo handles the POST request for creating new todos
-func (s *APIServer) handleCreateTodo(w http.ResponseWriter, r *http.Request) error {
-	req := new(models.CreateTodoRequest)
+// HandleCreateTodo handles the POST request for creating new todos
+func HandleCreateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	req := new(CreateTodoRequest)
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		return err
 	}
 
-	todo, err := models.NewTodo(req.Title, req.Description)
+	todo, err := NewTodo(req.Title, req.Description)
 	if err != nil {
 		return err
 	}
-	if err := s.store.CreateTodo(todo); err != nil {
+	if err := s.Store.CreateTodo(todo); err != nil {
 		return err
 	}
 
 	return WriteJSON(w, http.StatusOK, todo)
 }
 
-// handleGetTodoByID handles the GET request for getting all the todos
-func (s *APIServer) handleGetTodoByID(w http.ResponseWriter, r *http.Request) error {
-	id, err := getID(r)
+// HandleGetTodoByID handles the GET request for getting all the todos
+func HandleGetTodoByID(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	id, err := GetID(r)
 	if err != nil {
 		return err
 	}
 
-	todo, err := s.store.GetTodoByID(id)
+	todo, err := s.Store.GetTodoByID(id)
 	if err != nil {
 		return err
 	}
@@ -51,41 +53,65 @@ func (s *APIServer) handleGetTodoByID(w http.ResponseWriter, r *http.Request) er
 	return WriteJSON(w, http.StatusOK, todo)
 }
 
-// handleDeleteTodo handles the DELETE request for deleting todos
-func (s *APIServer) handleDeleteTodo(w http.ResponseWriter, r *http.Request) error {
-	id, err := getID(r)
+// HandleDeleteTodo handles the DELETE request for deleting todos
+func HandleDeleteTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	id, err := GetID(r)
 	if err != nil {
 		return err
 	}
 
-	if err := s.store.DeleteTodo(id); err != nil {
+	if err := s.Store.DeleteTodo(id); err != nil {
 		return err
 	}
 
 	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
 }
 
-// handleUpdateTodo handles the PATCH request for updating the todos
-func (s *APIServer) handleUpdateTodo(w http.ResponseWriter, r *http.Request) error {
-	req := new(models.UpdateTodoRequest)
+// HandleUpdateTodo handles the PATCH request for updating the todos
+func HandleUpdateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	req := new(UpdateTodoRequest)
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		return err
 	}
 
-	id, err := getID(r)
+	id, err := GetID(r)
 	if err != nil {
 		return err
 	}
 
-	todo, err := models.NewTodoUpdate(req.Title, req.Description, req.Completed)
+	todo, err := NewTodoUpdate(req.Title, req.Description, req.Completed)
 	if err != nil {
 		return err
 	}
 
-	updatedTodo, err := s.store.UpdateTodo(id, todo)
+	updatedTodo, err := s.Store.UpdateTodo(id, todo)
 	if err != nil {
 		return err
 	}
 
 	return WriteJSON(w, http.StatusOK, updatedTodo)
+}
+
+// WriteJSON is a Helper function to return JSON response to client
+func WriteJSON(w http.ResponseWriter, status int, v any) error {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	return json.NewEncoder(w).Encode(v)
+}
+
+// ApiError represents an error response in JSON format.
+type ApiError struct {
+	Error string `json:"error"`
+}
+
+// GetID is a helper function that returns the id from the url
+func GetID(r *http.Request) (int, error) {
+	idStr := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return id, fmt.Errorf("invalid id given %s", idStr)
+	}
+
+	return id, nil
 }
