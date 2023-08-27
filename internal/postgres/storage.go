@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api"
+	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api/models"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -24,11 +24,11 @@ var (
 )
 
 type Storage interface {
-	GetTodos() ([]api.Todo, error)
-	GetTodoByID(int) (*api.Todo, error)
-	CreateTodo(*api.Todo) error
+	GetTodos() ([]models.Todo, error)
+	GetTodoByID(int) (*models.Todo, error)
+	CreateTodo(*models.Todo) error
 	DeleteTodo(int) error
-	UpdateTodo(int, *api.Todo) (*api.Todo, error)
+	UpdateTodo(int, *models.Todo) (*models.Todo, error)
 }
 
 type PostgresStore struct {
@@ -55,8 +55,8 @@ func NewPostgres() (*PostgresStore, error) {
 }
 
 // GetTodos is a method that performs a query to get all the todos
-func (s *PostgresStore) GetTodos() ([]api.Todo, error) {
-	var todos []api.Todo
+func (s *PostgresStore) GetTodos() ([]models.Todo, error) {
+	var todos []models.Todo
 
 	rows, err := s.db.Query("SELECT * FROM todos ORDER BY id")
 	if err != nil {
@@ -65,7 +65,7 @@ func (s *PostgresStore) GetTodos() ([]api.Todo, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var todo api.Todo
+		var todo models.Todo
 		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.Completed); err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func (s *PostgresStore) GetTodos() ([]api.Todo, error) {
 }
 
 // CreateTodo is a method that performs a query to create new todo
-func (s *PostgresStore) CreateTodo(todo *api.Todo) error {
+func (s *PostgresStore) CreateTodo(todo *models.Todo) error {
 	query := `INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING id`
 
 	_, err := s.db.Query(query, todo.Title, todo.Description, todo.Completed)
@@ -88,7 +88,7 @@ func (s *PostgresStore) CreateTodo(todo *api.Todo) error {
 }
 
 // GetTodoByID is a method that performs a query to get one todo by ID
-func (s *PostgresStore) GetTodoByID(id int) (*api.Todo, error) {
+func (s *PostgresStore) GetTodoByID(id int) (*models.Todo, error) {
 	rows, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (s *PostgresStore) DeleteTodo(id int) error {
 }
 
 // UpdateTodo is a method that performs a query to update todos
-func (s *PostgresStore) UpdateTodo(id int, todoUpdate *api.Todo) (*api.Todo, error) {
+func (s *PostgresStore) UpdateTodo(id int, todoUpdate *models.Todo) (*models.Todo, error) {
 	// Retrieve the existing todo from the database
 	row, err := s.db.Query("SELECT * FROM todos WHERE id = $1", id)
 	if err != nil {
@@ -140,8 +140,8 @@ func (s *PostgresStore) UpdateTodo(id int, todoUpdate *api.Todo) (*api.Todo, err
 	return nil, fmt.Errorf("todo with ID %d not found", id)
 }
 
-func scanIntoTodos(rows *sql.Rows) (*api.Todo, error) {
-	todo := new(api.Todo)
+func scanIntoTodos(rows *sql.Rows) (*models.Todo, error) {
+	todo := new(models.Todo)
 	err := rows.Scan(
 		&todo.ID,
 		&todo.Title,

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api/models"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -22,12 +23,12 @@ func HandleGetTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
 
 // HandleCreateTodo handles the POST request for creating new todos
 func HandleCreateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
-	req := new(CreateTodoRequest)
+	req := new(models.CreateTodoRequest)
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		return err
 	}
 
-	todo, err := NewTodo(req.Title, req.Description)
+	todo, err := models.NewTodo(req.Title, req.Description)
 	if err != nil {
 		return err
 	}
@@ -69,7 +70,7 @@ func HandleDeleteTodo(s APIServer, w http.ResponseWriter, r *http.Request) error
 
 // HandleUpdateTodo handles the PATCH request for updating the todos
 func HandleUpdateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
-	req := new(UpdateTodoRequest)
+	req := new(models.UpdateTodoRequest)
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		return err
 	}
@@ -79,7 +80,7 @@ func HandleUpdateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error
 		return err
 	}
 
-	todo, err := NewTodoUpdate(req.Title, req.Description, req.Completed)
+	todo, err := models.NewTodoUpdate(req.Title, req.Description, req.Completed)
 	if err != nil {
 		return err
 	}
@@ -92,7 +93,7 @@ func HandleUpdateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error
 	return WriteJSON(w, http.StatusOK, updatedTodo)
 }
 
-// WriteJSON is a Helper function to return JSON response to client
+// WriteJSON is a Helper function to return JSON response to ui
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
