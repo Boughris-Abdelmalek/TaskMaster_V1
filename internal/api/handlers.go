@@ -96,6 +96,7 @@ func HandleUpdateTodo(s APIServer, w http.ResponseWriter, r *http.Request) error
 // WriteJSON is a Helper function to return JSON response to ui
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 	w.WriteHeader(status)
 
 	return json.NewEncoder(w).Encode(v)
