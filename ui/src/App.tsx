@@ -1,25 +1,27 @@
-import {useEffect, useState} from "react";
+import { useGetTodosQuery } from "./store/reducers/todo-api-slice.ts";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "./store/hooks.ts";
+import { selectAllTodos, setAllTodos } from "./store/reducers/todo-slice.ts";
 
 const App = () => {
-    const [todos, setTodos] = useState(null)
-    const fetchTodos = async () => {
-        const response = await fetch("http://localhost:8080/todos");
-        const data = await response.json();
+  const { data } = useGetTodosQuery("");
+  const dispatch = useAppDispatch();
+  const todos = useAppSelector(selectAllTodos);
 
-        setTodos(data);
+  useEffect(() => {
+    if (data) {
+      dispatch(setAllTodos(data));
     }
+  }, [data]);
 
-    useEffect(() => {
-        fetchTodos();
-    }, []);
+  return (
+    <ul>
+      {todos &&
+        Object.values(todos).map((todo) => {
+          return <li key={todo.id}>{todo.title}</li>;
+        })}
+    </ul>
+  );
+};
 
-    if (todos) {
-        console.log(todos)
-    }
-
-    return (
-        <h1>Hello World</h1>
-    )
-}
-
-export default App
+export default App;
