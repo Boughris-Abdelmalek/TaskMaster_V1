@@ -1,16 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store.ts";
-
-export interface Todo {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
-}
-
-export interface TodoState {
-  todos: Todo[];
-}
+import { TodoState } from "../../types/todo.ts";
 
 const initialState: TodoState = {
   todos: [],
