@@ -25,7 +25,7 @@ body {
   font-family: ${({ theme }) => theme.fonts.rowdies}, sans-serif;
   font-size: 1rem;
   color: ${({ theme }) => theme.colors.text};
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.secondary};
   line-height: 1;
 }
 h1,
@@ -102,15 +102,11 @@ export const Container = styled.div`
   width: 100%;
   max-width: 1360px;
   margin: 0 auto;
-  /* padding: 0 30px; */
-  padding: 0 ${({ theme }) => theme.paddings.container};
 `;
 export const SmallContainer = styled.div`
   width: 100%;
   max-width: 570px;
   margin: 0 auto;
-  /* padding: 0 30px; */
-  padding: 0 ${({ theme }) => theme.paddings.container};
 `;
 
 interface GridProps {

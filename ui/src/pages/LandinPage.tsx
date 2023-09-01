@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar.tsx";
 const LandingPage = () => {
   return (
     <>
-      <Navbar />
+      <Navbar variant={"transparent"} />
       <h1>Welcome to the Landing Page !</h1>
     </>
   );
