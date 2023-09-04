@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import Logo from "./Logo.tsx";
 import { FC } from "react";
 
@@ -13,18 +13,22 @@ const Header = styled.header<NavBarProps>`
   align-items: center;
   width: 100%;
   height: 5.375rem;
-  padding-inline: 1.375rem 8.5rem;
-  background-color: ${(props) =>
-    props.variant === "transparent" ? "transparent" : props.theme.colors.primary};
+  background-color: ${(props) => (props.variant === "transparent" ? "transparent" : "#FF4F5A")};
 `;
 
 const Nav = styled.nav`
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 2rem;
+
+  :first-child {
+    color: #ff4f5a;
+  }
 `;
 
 const NavigationLink = styled(NavLink)`
+  text-decoration: none;
+  color: #000000;
   width: 100%;
   white-space: nowrap;
 `;

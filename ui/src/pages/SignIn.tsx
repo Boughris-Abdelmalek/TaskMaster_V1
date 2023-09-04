@@ -1,10 +1,10 @@
 import Logo from "../components/Logo.tsx";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 const Container = styled.div`
   width: 512px;
   height: 533px;
-  background-color: ${(props) => props.theme.colors};
+  background-color: white;
 `;
 
 const SignIn = () => {

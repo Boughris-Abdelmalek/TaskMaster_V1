@@ -4,13 +4,11 @@ import TodoApp from "./pages/TodoApp.tsx";
 import SignIn from "./pages/SignIn.tsx";
 import SignUp from "./pages/SignUp.tsx";
 import { FC } from "react";
-import { ThemeProvider } from "styled-components";
-import { theme } from "./styles/Theme.ts";
-import { GlobalStyles } from "./styles/Global.ts";
+import { ThemeProvider } from "@mui/material";
+import theme from "./material-theme.ts";
 
 const App: FC = () => (
   <ThemeProvider theme={theme}>
-    <GlobalStyles />
     <BrowserRouter>
       <Routes>
         <Route index path={"/"} element={<LandingPage />} />

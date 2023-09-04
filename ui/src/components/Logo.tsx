@@ -1,7 +1,8 @@
 import logo from "../assets/icons/logo-144.svg";
 import logoWhite from "../assets/icons/logo-white-144.svg";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import { FC } from "react";
+import { Typography } from "@mui/material";
 
 type LogoVariantProps = {
   variant?: "white" | "";
@@ -21,20 +22,11 @@ const ImageLogo = styled.img`
   flex: 1;
 `;
 
-const TitleLogo = styled.h1<LogoVariantProps>`
-  font-size: 2.25rem;
-  width: 100%;
-  text-align: center;
-  white-space: nowrap;
-  color: ${(props) =>
-    props.variant === "white" ? props.theme.colors.white : props.theme.colors.primaryTextColor};
-`;
-
 const Logo: FC<LogoVariantProps> = ({ variant = "" }) => {
   return (
     <Container>
       <ImageLogo src={variant === "white" ? logoWhite : logo} alt={"logo"} />
-      <TitleLogo variant={variant}>Task Master</TitleLogo>
+      <Typography variant="h3">Task Master</Typography>
     </Container>
   );
 };
