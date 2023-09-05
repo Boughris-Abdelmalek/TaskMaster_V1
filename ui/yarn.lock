@@ -333,6 +333,11 @@
   resolved "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.1.1.tgz"
   integrity sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==
 
+"@fontsource-variable/rosario@^5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@fontsource-variable/rosario/-/rosario-5.0.9.tgz#c3bae4c8468b1d097a6e9387be4318d78b0bd016"
+  integrity sha512-aZY8t/D7G5gq0GB9IQHPAf/F2P1t8oMtbz+eq7pENLWr+YBWG+KQqFT2eQpl8hv+7cOh6VD3E8fLXwfLmvP/QQ==
+
 "@fontsource/rowdies@^5.0.11":
   version "5.0.11"
   resolved "https://registry.yarnpkg.com/@fontsource/rowdies/-/rowdies-5.0.11.tgz#49ccc4c53130cae058fcd317fd7efa36cb51fe68"

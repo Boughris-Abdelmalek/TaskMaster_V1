@@ -1,9 +1,19 @@
 import { createTheme } from "@mui/material";
 
 declare module "@mui/material/styles" {
-  interface Theme {}
-  // allow configuration using `createTheme`
-  interface ThemeOptions {}
+  interface Palette {
+    tertiary: {
+      main: string;
+      contrastText: string;
+    };
+  }
+
+  interface PaletteOptions {
+    tertiary?: {
+      main: string;
+      contrastText: string;
+    };
+  }
 }
 
 const palette = {
@@ -13,6 +23,10 @@ const palette = {
   },
   secondary: {
     main: "#F9F9F9",
+    contrastText: "#fff",
+  },
+  tertiary: {
+    main: "#FFFFFF",
     contrastText: "#fff",
   },
   text: {
@@ -28,50 +42,103 @@ const palette = {
 };
 
 const typography = {
-  fontFamily: "Rowdies",
+  fontFamily: "Rosario Variable",
   h1: {
-    fontFamily: "Rowdies",
-    color: palette.primary.main,
+    fontFamily: "Rosario Variable",
+    color: palette.text.black,
     fontStyle: "normal",
   },
   h2: {
-    fontFamily: "Rowdies",
-    color: palette.primary.main,
+    fontFamily: "Rosario Variable",
+    color: palette.text.black,
     fontStyle: "normal",
   },
   h3: {
-    fontFamily: "Rowdies",
-    color: palette.primary.main,
+    fontFamily: "Rosario Variable",
+    color: palette.text.black,
     fontStyle: "normal",
   },
   h4: {
-    fontFamily: "Rowdies",
-    color: palette.primary.main,
+    fontFamily: "Rosario Variable",
+    color: palette.text.black,
   },
   h5: {
-    fontFamily: "Rowdies",
-    color: palette.primary.main,
+    fontFamily: "Rosario Variable",
+    color: palette.text.black,
   },
   h6: {
-    fontFamily: "Rowdies",
-    color: palette.primary.main,
+    fontFamily: "Rosario Variable",
+    color: palette.text.black,
   },
   subtitle1: {},
   subtitle2: {},
   body1: {},
   body2: {},
   caption: {},
-  button: {},
+  button: {
+    fontFamily: "Rosario Variable",
+  },
   overline: {},
+};
+
+const breakpoints = {
+  values: {
+    xs: 0,
+    sm: 600,
+    md: 900,
+    lg: 1200,
+    xl: 1363,
+  },
 };
 
 let theme = createTheme({
   palette,
   typography,
+  breakpoints,
 });
 
 theme = createTheme(theme, {
-  components: {},
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: theme.palette.tertiary.main,
+        },
+      },
+      defaultProps: {
+        variant: "elevation",
+        elevation: 0,
+      },
+    },
+    MuiToolbar: {
+      defaultProps: {
+        variant: "dense",
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          transition: "unset",
+          textTransform: "capitalize",
+          fontWeight: "700",
+          fontStyle: theme.typography.button,
+        },
+      },
+      defaultProps: {
+        size: "small",
+        variant: "contained",
+        disableElevation: true,
+      },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          maxWidth: "1363px",
+        },
+      },
+    },
+  },
 });
 
 export default theme;

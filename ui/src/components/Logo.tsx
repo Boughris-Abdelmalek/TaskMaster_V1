@@ -1,33 +1,20 @@
-import logo from "../assets/icons/logo-144.svg";
-import logoWhite from "../assets/icons/logo-white-144.svg";
-import styled from "@emotion/styled";
+import logo from "../assets/icons/logo-41.svg";
+import logoWhite from "../assets/icons/logo-white-41.svg";
 import { FC } from "react";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 type LogoVariantProps = {
   variant?: "white" | "";
 };
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 45px;
-  width: 17rem;
-`;
-
-const ImageLogo = styled.img`
-  height: 100%;
-  width: 100%;
-  flex: 1;
-`;
-
 const Logo: FC<LogoVariantProps> = ({ variant = "" }) => {
   return (
-    <Container>
-      <ImageLogo src={variant === "white" ? logoWhite : logo} alt={"logo"} />
-      <Typography variant="h3">Task Master</Typography>
-    </Container>
+    <Box sx={{ display: "flex", flexGrow: 1, columnGap: 2 }}>
+      <img src={variant === "white" ? logoWhite : logo} alt="logo" />
+      <Typography variant="h4" fontFamily="Rowdies" color="#FF4F5A">
+        Task Master
+      </Typography>
+    </Box>
   );
 };
 

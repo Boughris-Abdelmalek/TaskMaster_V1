@@ -13,8 +13,8 @@ const App: FC = () => (
       <Routes>
         <Route index path={"/"} element={<LandingPage />} />
         <Route path={"/todo-app"} element={<TodoApp />} />
-        <Route path={"/sign-in"} element={<SignIn />} />
-        <Route path={"/sign-up"} element={<SignUp />} />
+        <Route path={"/login"} element={<SignIn />} />
+        <Route path={"/signup"} element={<SignUp />} />
       </Routes>
     </BrowserRouter>
   </ThemeProvider>
