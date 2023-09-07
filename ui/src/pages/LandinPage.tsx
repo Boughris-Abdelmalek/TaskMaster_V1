@@ -17,6 +17,7 @@ import writeItIcon from "../assets/icons/write-it-icon.svg";
 import doItIcon from "../assets/icons/do-it-icon.svg";
 import repeatIcon from "../assets/icons/repeat-icon.svg";
 import { FC } from "react";
+import Footer from "../components/Footer.tsx";
 
 const steps = [
   { icon: smallTaskIcon, label: "small task" },
@@ -83,6 +84,7 @@ const LandingPage = () => {
           </CardActions>
         </Box>
       </Card>
+      <Footer />
     </Container>
   );
 };
