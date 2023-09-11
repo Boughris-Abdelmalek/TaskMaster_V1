@@ -1,21 +1,20 @@
-import Logo from "../components/Logo.tsx";
+import AuthBox from "../components/AuthBox.tsx";
+import { Box } from "@mui/material";
 import styled from "@emotion/styled";
+import theme from "../material-theme.ts";
 
-const Container = styled.div`
-  width: 512px;
-  height: 533px;
-  background-color: white;
+const Container = styled(Box)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: ${theme.palette.secondary.main};
 `;
 
 const SignIn = () => {
   return (
     <Container>
-      <Logo />
-      <h3>Sign In</h3>
-      <input />
-      <input />
-      <br />
-      <p>Not have an account? Sign Up</p> {/* Fixed the grammar here */}
+      <AuthBox />
     </Container>
   );
 };

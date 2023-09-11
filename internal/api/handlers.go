@@ -4,11 +4,78 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api/models"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
+
+func HandleLogin(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	if r.Method != "POST" {
+		return fmt.Errorf("method not allowed %s", r.Method)
+	}
+
+	var req models.LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return err
+	}
+
+	acc, err := s.Store.GetUserByUserName(req.UserName)
+	if err != nil {
+		return err
+	}
+
+	token, err := createJWT(acc)
+	if err != nil {
+		return err
+	}
+
+	resp := models.LoginResponse{
+		Token:    token,
+		UserName: acc.UserName,
+	}
+
+	return WriteJSON(w, http.StatusOK, resp)
+}
+
+func HandleUser(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	if r.Method == "GET" {
+		return HandleGetUser(s, w, r)
+	}
+	if r.Method == "POST" {
+		return HandleCreateUser(s, w, r)
+	}
+
+	return fmt.Errorf("method not allowed %s", r.Method)
+}
+
+func HandleGetUser(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	users, err := s.Store.GetUser()
+	if err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, users)
+}
+
+func HandleCreateUser(s APIServer, w http.ResponseWriter, r *http.Request) error {
+	req := new(models.CreateUserRequest)
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		return err
+	}
+
+	user, err := models.NewAccount(req.FirstName, req.LastName, req.UserName, req.Email, req.Password)
+	if err != nil {
+		return err
+	}
+	if err := s.Store.CreateUser(user); err != nil {
+		return err
+	}
+
+	return WriteJSON(w, http.StatusOK, user)
+}
 
 // HandleGetTodo handles the GET request for fetching todos.
 func HandleGetTodo(s APIServer, w http.ResponseWriter, r *http.Request) error {
@@ -100,6 +167,18 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.WriteHeader(status)
 
 	return json.NewEncoder(w).Encode(v)
+}
+
+func createJWT(user *models.User) (string, error) {
+	claims := &jwt.MapClaims{
+		"expiresAt": 15000,
+		"ID":        user.ID,
+	}
+
+	secret := os.Getenv("JWT_SECRET")
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(secret))
 }
 
 // ApiError represents an error response in JSON format.

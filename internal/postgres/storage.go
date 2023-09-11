@@ -29,6 +29,10 @@ type Storage interface {
 	CreateTodo(*models.Todo) error
 	DeleteTodo(int) error
 	UpdateTodo(int, *models.Todo) (*models.Todo, error)
+	GetUser() ([]models.User, error)
+	GetUserByID(int) (*models.User, error)
+	GetUserByUserName(string) (*models.User, error)
+	CreateUser(*models.User) error
 }
 
 type PostgresStore struct {
@@ -52,6 +56,82 @@ func NewPostgres() (*PostgresStore, error) {
 	return &PostgresStore{
 		db: db,
 	}, nil
+}
+
+func (s *PostgresStore) CreateUser(acc *models.User) error {
+	query := `INSERT INTO users
+	(first_name, last_name, user_name, password, user_type, email, created_at) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7)`
+
+	_, err := s.db.Query(
+		query,
+		acc.FirstName,
+		acc.LastName,
+		acc.UserName,
+		acc.Email,
+		acc.Password,
+		acc.CreatedAt,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PostgresStore) GetUserByUserName(user_name string) (*models.User, error) {
+	rows, err := s.db.Query("SELECT * FROM users WHERE user_name = $1", user_name)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		return scanIntoUsers(rows)
+	}
+
+	return nil, fmt.Errorf("username %s does not exist", user_name)
+}
+
+func (s *PostgresStore) GetUserByID(id int) (*models.User, error) {
+	rows, err := s.db.Query("SELECT * FROM users WHERE id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		return scanIntoUsers(rows)
+	}
+
+	return nil, fmt.Errorf("user %d not found", id)
+}
+
+func (s *PostgresStore) GetUser() ([]models.User, error) {
+	var users []models.User
+
+	rows, err := s.db.Query("SELECT * FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.UserName,
+			&user.UserType,
+			&user.Email,
+			&user.Password,
+			&user.CreatedAt); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 // GetTodos is a method that performs a query to get all the todos
@@ -149,4 +229,19 @@ func scanIntoTodos(rows *sql.Rows) (*models.Todo, error) {
 		&todo.Completed,
 	)
 	return todo, err
+}
+
+func scanIntoUsers(rows *sql.Rows) (*models.User, error) {
+	user := new(models.User)
+	err := rows.Scan(
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.UserName,
+		&user.UserType,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+	)
+	return user, err
 }

@@ -6,10 +6,18 @@ declare module "@mui/material/styles" {
       main: string;
       contrastText: string;
     };
+    lightGray: {
+      main: string;
+      contrastText: string;
+    };
   }
 
   interface PaletteOptions {
     tertiary?: {
+      main: string;
+      contrastText: string;
+    };
+    lightGray?: {
       main: string;
       contrastText: string;
     };
@@ -27,7 +35,11 @@ const palette = {
   },
   tertiary: {
     main: "#FFFFFF",
-    contrastText: "#fff",
+    contrastText: "#000",
+  },
+  lightGray: {
+    main: "#D8D8D8",
+    contrastText: "#000", // Adjust this as needed
   },
   text: {
     primary: "#FF4F5A",

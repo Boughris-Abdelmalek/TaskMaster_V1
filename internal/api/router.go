@@ -9,6 +9,9 @@ import (
 const (
 	todosPath  = "/todos"
 	todoIDPath = "/todos/{id}"
+	usersPath  = "/users"
+	userIDPath = "/users/{id}"
+	loginPath  = "/login"
 )
 
 // RegisterRoutes starts the API server and listens for incoming requests.
@@ -20,6 +23,9 @@ func (s *APIServer) RegisterRoutes() {
 	router.HandleFunc(todoIDPath, makeHTTPHandleFunc(HandleGetTodoByID, s)).Methods("GET")
 	router.HandleFunc(todoIDPath, makeHTTPHandleFunc(HandleDeleteTodo, s)).Methods("DELETE")
 	router.HandleFunc(todoIDPath, makeHTTPHandleFunc(HandleUpdateTodo, s)).Methods("PATCH")
+
+	router.HandleFunc(usersPath, makeHTTPHandleFunc(HandleUser, s))
+	router.HandleFunc(loginPath, makeHTTPHandleFunc(HandleLogin, s))
 
 	log.Println("JSON API server running on port: ", s.listenAddr)
 
