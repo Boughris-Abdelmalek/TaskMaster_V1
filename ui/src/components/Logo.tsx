@@ -11,7 +11,11 @@ const Logo: FC<LogoVariantProps> = ({ variant = "" }) => {
   return (
     <Box sx={{ display: "flex", flexGrow: 1, columnGap: 2 }}>
       <img src={variant === "white" ? logoWhite : logo} alt="logo" />
-      <Typography variant="h4" fontFamily="Rowdies" color="#FF4F5A">
+      <Typography
+        variant="h4"
+        fontFamily="Rowdies"
+        color={variant === "white" ? "#FFFFFF" : "#FF4F5A"}
+      >
         Task Master
       </Typography>
     </Box>

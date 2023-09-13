@@ -100,6 +100,7 @@ const breakpoints = {
     md: 900,
     lg: 1200,
     xl: 1363,
+    xxl: "100%",
   },
 };
 

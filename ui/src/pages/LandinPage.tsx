@@ -48,7 +48,7 @@ const LandingPage = () => {
           </Typography>
         </CardContent>
         <CardActions sx={{ display: "flex", justifyContent: "center" }}>
-          <Button size="large" sx={{ fontSize: "1.75rem", mt: 5, px: 6 }}>
+          <Button size="large" href="/todo-app" sx={{ fontSize: "1.75rem", mt: 5, px: 6 }}>
             Get started
           </Button>
         </CardActions>

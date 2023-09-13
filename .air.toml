@@ -1,3 +1,26 @@
 [build]
 # Just plain old shell command. You could use `make` as well.
 cmd = "go build -o ./tmp/main ./cmd"
+# Ignore these filename extensions or directories.
+exclude_dir = ["ui/node_modules"]
+
+[log]
+# Show log time
+time = false
+# Only show main log (silences watcher, build, runner)
+main_only = false
+
+[color]
+# Customize each part's color. If no color found, use the raw app log.
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+# Delete tmp directory on exit
+clean_on_exit = true
+
+[screen]
+clear_on_rebuild = true
+keep_scroll = true
