@@ -11,4 +11,4 @@ run-fe:
 	cd ./ui && yarn dev
 
 stop-port:
-	kill $( lsof -i :5432 -t )
+	sudo kill $( sudo lsof -i :5432 -t )

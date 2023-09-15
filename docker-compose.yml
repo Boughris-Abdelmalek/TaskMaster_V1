@@ -28,7 +28,7 @@ services:
       - postgres:/data/task-master-sql
     command: -p 5432
     ports:
-      - "5432:5432"
+      - "5432:5431"
     expose:
       - "5432"
     restart: unless-stopped

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/Boughris-Abdelmalek/TaskMaster_V1/internal/api/models"
+	"net"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -12,15 +13,14 @@ import (
 const (
 	dbUsername = "DB_USER"
 	dbPassword = "DB_PASSWORD"
-	dbHost     = "DB_HOST"
 	dbSchema   = "DB_NAME"
 )
 
 var (
 	username = os.Getenv(dbUsername)
 	password = os.Getenv(dbPassword)
-	host     = os.Getenv(dbHost)
 	schema   = os.Getenv(dbSchema)
+	host     = "192.168.1.91"
 )
 
 type Storage interface {
@@ -41,6 +41,8 @@ type PostgresStore struct {
 
 // NewPostgres set up the connection to with the db
 func NewPostgres() (*PostgresStore, error) {
+	// Get the local computer's IP address
+
 	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, password, schema)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -56,6 +58,26 @@ func NewPostgres() (*PostgresStore, error) {
 	return &PostgresStore{
 		db: db,
 	}, nil
+}
+
+func getLocalIPAddress() (string, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", err
+	}
+
+	addrs, err := net.LookupIP(hostname)
+	if err != nil {
+		return "", err
+	}
+
+	for _, addr := range addrs {
+		if !addr.IsLoopback() && addr.To4() != nil {
+			return addr.String(), nil
+		}
+	}
+
+	return "", fmt.Errorf("no suitable IP address found")
 }
 
 func (s *PostgresStore) CreateUser(acc *models.User) error {
